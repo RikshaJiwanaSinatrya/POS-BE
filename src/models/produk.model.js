@@ -8,7 +8,15 @@ exports.getAll = async () => {
     return rows
 }
 
-// Mencari produk  berdasarkan nama
+// Mencari produk berdasarkan ID
+exports.getById = async (id) => {
+    const [rows] = await db.query(
+        'SELECT * FROM produk WHERE id = ? AND deleted_at = "0000-00-00 00:00:00"', [id]
+    )
+    return rows[0]
+}
+
+// Mencari produk berdasarkan nama
 exports.getByName = async (nama_produk) => {
     const [rows] = await db.query(
         'SELECT * FROM produk WHERE nama_produk = ? AND deleted_at = "0000-00-00 00:00:00"', [nama_produk]

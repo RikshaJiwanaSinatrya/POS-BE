@@ -3,13 +3,18 @@ const orderModel = require('../models/order.model');
 
 exports.createOrder = async (req, res, next) => {
     try {
+        console.log('REQ BODY:', JSON.stringify(req.body, null, 2));
+        console.log('Calling orderService.createData...');
         const order = await orderService.createData(req.body);
+        console.log('SUCCESS, returning:', JSON.stringify(order));
         res.status(201).json({
             status: 'success',
             data: order
         })
     } catch (error) {
-        next(error) //lempar error bawaan express acu
+        console.error('ORDER ERROR:', error);
+        console.error('STACK:', error.stack);
+        next(error)
     }
 }
 
