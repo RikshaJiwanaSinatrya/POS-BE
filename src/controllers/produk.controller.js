@@ -41,3 +41,20 @@ exports.createProduk = async (req, res) => {
         });
     };
 }
+
+exports.deleteProduk = async (req, res) => {
+    try {
+        const { id } = req.params;
+        await produkService.deleteData(id);
+        res.json({
+            status: 'success',
+            message: 'Produk berhasil dihapus'
+        });
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            status: 'error',
+            statusCode: error.statusCode || 500,
+            message: error.message || 'Terjadi kesalahan pada server'
+        });
+    }
+}

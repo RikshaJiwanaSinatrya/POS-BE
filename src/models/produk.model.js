@@ -31,3 +31,10 @@ exports.create = async (data) => {
         [data.id, data.nama_produk, data.harga_produk, data.jenis_produk, data.foto_produk]
     )
 }
+
+exports.deleteById = async (id) => {
+    await db.query(
+        'UPDATE produk SET deleted_at = NOW() WHERE id = ?',
+        [id]
+    )
+}

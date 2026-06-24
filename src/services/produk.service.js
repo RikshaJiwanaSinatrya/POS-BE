@@ -35,3 +35,15 @@ exports.createData = async (data, file) => {
     await produkModel.create(newData);
     return newData;
 }
+
+exports.deleteData = async (id) => {
+    const produk = await produkModel.getById(id);
+    if (!produk) {
+        const error = new Error('Produk tidak ditemukan');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    await produkModel.deleteById(id);
+    return { id };
+}
