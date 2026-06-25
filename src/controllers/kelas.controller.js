@@ -3,12 +3,12 @@ const kelasService = require('../services/kelas.service')
 
 exports.getAll = asyncHandler(async (req, res) => {
   const data = await kelasService.getAll()
-  res.json(data)
+  res.json({ status: 'success', data })
 })
 
 exports.getById = asyncHandler(async (req, res) => {
   const data = await kelasService.getById(req.params.kode_kelas)
-  res.json(data)
+  res.json({ status: 'success', data })
 })
 
 exports.create = asyncHandler(async (req, res) => {

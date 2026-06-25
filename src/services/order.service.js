@@ -33,7 +33,8 @@ exports.createData = async (data) => {
                 { statusCode: 400 }
             );
         }
-        resolvedItems.push({ produk_id: produkId, jumlah: item.jumlah });
+        const produk = await produkModel.getById(produkId);
+        resolvedItems.push({ produk_id: produkId, nama_produk: produk ? produk.nama_produk : '', jumlah: item.jumlah });
     }
 
     const id = crypto.randomUUID();

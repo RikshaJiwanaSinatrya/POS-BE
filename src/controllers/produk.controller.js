@@ -42,6 +42,62 @@ exports.createProduk = async (req, res) => {
     };
 }
 
+exports.getAllProduk = async (req, res) => {
+    try {
+        const produk = await produkService.getAllData();
+        res.json({
+            status: 'success',
+            data: produk
+        });
+    } catch (error) {
+        res.status(error.statusCode || 500).json({
+            status: 'error',
+            statusCode: error.statusCode || 500,
+            message: error.message || 'Terjadi kesalahan pada server'
+        });
+    }
+}
+
+exports.updateProduk = async (req, res) => {
+  try {
+    if (req.file) {
+      const uniqueSuffix = Date.now() + '_' + Math.round(Math.random() * 1E9);
+      const namaFileBaru = uniqueSuffix + '.webp';
+      const lokasiSimpan = path.join(process.cwd(), 'public/uploads', namaFileBaru);
+      await sharp(req.file.buffer)
+        .resize({ width: 800 })
+        .webp({ quality: 80 })
+        .toFile(lokasiSimpan);
+      req.file.filename = namaFileBaru;
+    }
+    const produk = await produkService.updateData(req.params.id, req.body, req.file);
+    res.json({
+      status: 'success',
+      message: 'Produk berhasil diperbarui',
+      data: produk
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      status: 'error',
+      statusCode: error.statusCode || 500,
+      message: error.message || 'Terjadi kesalahan pada server'
+    });
+  }
+}
+
+exports.getProdukById = async (req, res) => {
+  try {
+    const produk = await produkService.getDataById(req.params.id);
+    res.json({ status: 'success', data: produk });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      status: 'error',
+      statusCode: error.statusCode || 500,
+      message: error.message || 'Terjadi kesalahan pada server'
+    });
+  }
+}
+
 exports.deleteProduk = async (req, res) => {
     try {
         const { id } = req.params;

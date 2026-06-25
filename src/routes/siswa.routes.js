@@ -7,13 +7,13 @@ const authMiddleware = require('../middlewares/auth.middleware')
 
 router.get('/', authMiddleware, async (req, res) => {
   const data = await siswaModel.findAll()
-  res.json(data)
+  res.json({ status: 'success', data })
 })
 
 
 router.get('/detail/:id', authMiddleware, async (req, res) => {
   const data = await siswaModel.findById(req.params.id)
-  res.json(data)
+  res.json({ status: 'success', data })
 })
 
 router.post('/', authMiddleware, siswaController.create)

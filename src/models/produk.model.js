@@ -32,6 +32,13 @@ exports.create = async (data) => {
     )
 }
 
+exports.update = async (id, data) => {
+  await db.query(
+    'UPDATE produk SET nama_produk = ?, harga_produk = ?, jenis_produk = ?, foto_produk = ? WHERE id = ?',
+    [data.nama_produk, data.harga_produk, data.jenis_produk, data.foto_produk, id]
+  )
+}
+
 exports.deleteById = async (id) => {
     await db.query(
         'UPDATE produk SET deleted_at = NOW() WHERE id = ?',

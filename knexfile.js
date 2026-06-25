@@ -11,7 +11,7 @@ module.exports = {
     host: '127.0.0.1',
     port: 3306,
     user: 'root',
-    password: '123',        // XAMPP defaultnya kosong
+    password: '123456',        // XAMPP defaultnya kosong
     database: 'pos_db'
   }
 },
