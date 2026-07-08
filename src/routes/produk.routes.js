@@ -3,12 +3,12 @@ const router = express.Router();
 
 const produkController = require ('../controllers/produk.controller');
 const authMiddleware = require ('../middlewares/auth.middleware');
-const upload = require ('../middlewares/upload.middleware');
+const allowRoles = require('../middlewares/role.middleware')
 
 router.get('/', produkController.getAllProduk);
-router.post('/', authMiddleware, upload.single('foto_produk'), produkController.createProduk);
-router.put('/:id', authMiddleware, upload.single('foto_produk'), produkController.updateProduk);
+router.post('/', authMiddleware, allowRoles('admin'), produkController.createProduk);
+router.put('/:id', authMiddleware, allowRoles('admin'), produkController.updateProduk);
 router.get('/:id', produkController.getProdukById);
-router.delete('/:id', authMiddleware, produkController.deleteProduk);
+router.delete('/:id', authMiddleware, allowRoles('admin'), produkController.deleteProduk);
 
 module.exports = router;

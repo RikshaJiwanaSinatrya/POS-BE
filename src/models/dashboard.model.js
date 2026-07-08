@@ -3,11 +3,19 @@ const db = require('../config/db');
 // --- KODINGAN APRILIA (Diperbaiki Typo SQL-nya) ---
 exports.getDailyOrders = async () => {
     const [rows] = await db.query(`
-        SELECT DATE(created_at) as tanggal, COUNT(id) as total_order
-        FROM orders
-        GROUP BY DATE(created_at)
-        ORDER BY tanggal DESC
-        LIMIT 7
+        SELECT DATE_FORMAT(dates.tanggal, '%Y-%m-%d') as tanggal, COALESCE(SUM(o.total_harga), 0) as total_order
+        FROM (
+            SELECT CURDATE() as tanggal
+            UNION ALL SELECT CURDATE() - INTERVAL 1 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 2 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 3 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 4 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 5 DAY
+            UNION ALL SELECT CURDATE() - INTERVAL 6 DAY
+        ) dates
+        LEFT JOIN orders o ON DATE(o.created_at) = dates.tanggal
+        GROUP BY dates.tanggal
+        ORDER BY dates.tanggal ASC
     `);
     return rows;
 };
@@ -56,12 +64,32 @@ exports.getSummary = async () => {
     };
 };
 
+// Top Menus: Menu Terlaris
+exports.getTopMenus = async () => {
+    const [rows] = await db.query('SELECT items FROM orders WHERE items IS NOT NULL AND items != "[]"');
+    const countMap = new Map();
+    for (const row of rows) {
+        let items;
+        try { items = JSON.parse(row.items); } catch { continue; }
+        if (!Array.isArray(items)) continue;
+        for (const item of items) {
+            const name = item.nama_produk || item.produk_id || '';
+            if (!name) continue;
+            const qty = Math.max(1, Number(item.jumlah) || 0);
+            countMap.set(name, (countMap.get(name) || 0) + qty);
+        }
+    }
+    return [...countMap.entries()]
+        .map(([nama_produk, total_terjual]) => ({ nama_produk, total_terjual }))
+        .sort((a, b) => b.total_terjual - a.total_terjual)
+        .slice(0, 5);
+};
+
 // Checklist 4: Tabel Order Terbaru (Dikembalikan lagi kodingannya)
 exports.getRecentOrders = async () => {
     const [rows] = await db.query(`
-        SELECT orders.id, orders.nama_pelanggan, produk.nama_produk as barang, orders.status_pesanan
+        SELECT orders.id, orders.nama_pelanggan, orders.total_harga, orders.status_pesanan
         FROM orders
-        JOIN produk ON orders.produk_id = produk.id
         ORDER BY orders.created_at DESC
         LIMIT 5
     `);

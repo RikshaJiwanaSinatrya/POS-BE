@@ -10,7 +10,7 @@ exports.getChartData = async (req, res, next) => {
 
 
         res.status(200).json({
-            status: 'succes',
+            status: 'success',
             message: 'Berhasil mengambil data untuk chart dashboard',
             data: {
                 chart_harian: dailyOrders,
@@ -20,6 +20,19 @@ exports.getChartData = async (req, res, next) => {
 } catch (error) {
     next(error);
 }
+};
+
+exports.getTopMenus = async (req, res, next) => {
+    try {
+        const topMenus = await dashboardModel.getTopMenus();
+        res.status(200).json({
+            status: 'success',
+            message: 'Berhasil mengambil data menu terlaris',
+            data: topMenus
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 
 // CODE AHMAD

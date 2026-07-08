@@ -34,7 +34,26 @@ exports.createData = async (data) => {
             );
         }
         const produk = await produkModel.getById(produkId);
-        resolvedItems.push({ produk_id: produkId, nama_produk: produk ? produk.nama_produk : '', jumlah: item.jumlah });
+        if (!produk) {
+            throw Object.assign(
+                new Error(`Produk dengan ID "${produkId}" tidak ditemukan`),
+                { statusCode: 400 }
+            );
+        }
+        const stokTersedia = produk.stok || 0;
+        const diminta = Number(item.jumlah);
+        if (stokTersedia < diminta) {
+            throw Object.assign(
+                new Error(`Stok "${produk.nama_produk}" tidak mencukupi (tersedia: ${stokTersedia}, diminta: ${diminta})`),
+                { statusCode: 400 }
+            );
+        }
+        resolvedItems.push({ produk_id: produkId, nama_produk: produk.nama_produk, jumlah: diminta });
+    }
+
+    for (const item of resolvedItems) {
+        const produk = await produkModel.getById(item.produk_id);
+        await produkModel.updateStock(item.produk_id, (produk.stok || 0) - item.jumlah);
     }
 
     const id = crypto.randomUUID();
@@ -46,7 +65,7 @@ exports.createData = async (data) => {
         jumlah: resolvedItems[0].jumlah,
         total_harga: data.total_harga,
         items: JSON.stringify(resolvedItems),
-        status_pesanan: "Proses"
+        status_pesanan: "Diproses"
     }
 
     await orderModel.create(newOrder);
@@ -56,6 +75,6 @@ exports.createData = async (data) => {
         nama_pelanggan: data.nama_pelanggan,
         total_harga: data.total_harga,
         items: resolvedItems,
-        status_pesanan: "Proses"
+        status_pesanan: "Diproses"
     };
 }
